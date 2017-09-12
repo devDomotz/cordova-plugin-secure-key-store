@@ -138,24 +138,31 @@
         [self handleAppUninstallation];
         [self.commandDelegate runInBackground:^{
             @synchronized(self) {
-                // get mutable dictionaly and retrieve store data
-                NSMutableDictionary *dict = [self readFromSecureKeyStore];
-                NSString *value = nil;
+             @try {
+                    // get mutable dictionaly and retrieve store data
+                    NSMutableDictionary *dict = [self readFromSecureKeyStore];
+                    NSString *value = nil;
 
-                if (dict != nil) {
-                    value =[dict valueForKey:key];
-                }
+                    if (dict != nil) {
+                        value =[dict valueForKey:key];
+                    }
 
-                if (value != nil) {
-                    value =[dict valueForKey:key];
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                } else {
-                    NSString* errorMessage = @"{\"code\":1,\"message\":\"key does not present\"}";
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    if (value != nil) {
+                        value =[dict valueForKey:key];
+                        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    } else {
+                        NSString* errorMessage = @"{\"code\":1,\"message\":\"key does not present\"}";
+                        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    }
                 }
             }
+           @catch (NSException* exception){
+              NSString* errorMessage = [NSString stringWithFormat:@"{\"code\":1,\"message\":\"key does not present\",\"actual-error\":%@}", exception];
+              pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+           }
         }];
     }
     @catch (NSException* exception)

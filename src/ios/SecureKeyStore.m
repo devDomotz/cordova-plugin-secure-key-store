@@ -160,7 +160,7 @@
             }
            @catch (NSException* exception){
               NSString* errorMessage = [NSString stringWithFormat:@"{\"code\":1,\"message\":\"key does not present\",\"actual-error\":%@}", exception];
-              pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+              CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
               [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
            }
         }];
